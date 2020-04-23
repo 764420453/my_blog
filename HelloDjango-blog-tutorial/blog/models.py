@@ -1,3 +1,4 @@
+import markdown
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -6,6 +7,7 @@ from django.db import models
 # 分类
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import strip_tags
 
 
 class Category(models.Model):
@@ -50,6 +52,18 @@ class Post(models.Model):
 
     def save(self, *args,**kwargs):
         self.modified_time=timezone.now()
+
+        # 首先实力化一个Markdown类，用于渲染body的文本
+        # 由于摘要并不需要生成文章目录，所以去掉了目录拓展
+        md=markdown.Markdown(extensions=[
+            'markdown.extensions.extra',
+            'markdown.extensions.codehilite',
+        ])
+        # 先讲Markdown文本渲染成Html文本，
+        # strip_tags去掉Html文本的全部HTML标签
+        # 从文本摘取前54个字符赋给excerpt
+        self.excerpt=strip_tags(md.convert(self.body))[:54]
+
         super().save(*args,**kwargs)
 
 
