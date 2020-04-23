@@ -11,3 +11,4 @@ urlpatterns = [
     path('tags/<int:pk>/',views.tag,name='tag'),
 
 ]
+
